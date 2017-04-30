@@ -1,0 +1,32 @@
+<div id="anzeige">
+    
+    <div id="diagram">
+    <h1>Diagramm</h1>
+    </div>
+    
+    <div class="aktienBox">
+        
+        <div ng-repeat="aktien in aktienShow">
+        <div class="aktien">
+            <button class="deleteButton" ng-click="deleteAktie(aktien)">X</button>
+            <h2>{{aktien}}</h2>
+            <p>Aktien Infos</p>
+        </div>
+        </div>
+        
+        
+        <div class="aktien ">
+            <h2>Aktien hinzufügen:</h2>
+                
+                <input placeholder="google" ng-model="neueAktie" ng-keypress="aktienAdd(neueAktie, $event)"/>
+                <button class="addButton" ng-click="aktienAdd(neueAktie, $event)">+</button>   
+
+                         
+           
+
+        </div>
+        
+    </div>
+    
+</div>
+

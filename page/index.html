@@ -5,17 +5,17 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
         <link href="style.css" type="text/css" rel="stylesheet">
     </head>
-    <body>
+    <body ng-app="app">
         
-        <h1>hello world</h1>
+       
+       <ng-view></ng-view>
         
         
-        
-        <script src="app.js"></script>
-        
-        <!-- Angular-->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-cookies.min.js"></script>        
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-cookies.min.js"></script>  
+        <script src="app.js"></script>
+        <script src="home/home.ctr.js"></script>
+    
     </body>
 </html>

@@ -1,0 +1,122 @@
+body{
+    background-color: #585858;
+}
+
+input{
+    margin-top: 5%;
+    margin-left: 5%;
+    width: 55%;
+    height: 25%;
+    float: left;
+    font-size: 20px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#anzeige{
+    margin-top: 5%;
+    margin-left: 20%;
+    
+}
+
+
+#diagram{
+    color: white;
+    width: 80%;
+    height: 40%;
+    background-color: #1C1C1C;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.aktienBox{
+    width: 80%;
+    height: auto;
+    background-color: #1C1C1C;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    
+}
+
+.aktienBox:after{
+    clear: both;
+    content:"";
+    display: block;
+}
+
+.aktien{
+    background-color: white;
+    width: 48%;
+    height: 115px;
+    margin-left: 1%;
+    margin-top: 1%;
+    padding-left: 1%;
+    display:inline-block;
+    border-radius: 10px;
+    float:left;
+    border: solid 3px;
+}
+
+
+
+.aktien:hover{
+    
+    border-color: green;
+}
+
+
+
+.deleteButton{
+    width: 15%;
+    height: 20%;
+    float: right;
+    border: none;
+    background-color: white;
+    border-top-right-radius: 10px;
+}
+
+.deleteButton:hover{
+    font-size: 20;
+    font-weight: 900;
+}
+
+.addButton{
+    font-size: 20px;
+    width: 15%;
+    height: 25%;
+    margin-top: 5%;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+
+
+
+
+
+
+@media all and (max-width: 500px){
+    
+    h2{
+        font-size: 15px;
+    }
+    p{
+        font-size: 12px;
+    }
+    
+    input{
+        font-size: 10px;
+    }
+    
+    .deleteButton:hover{
+        font-size: 15;
+    }
+    
+    .addButton, .deleteButton{
+        font-size: 10px;
+        width: 25%;
+    }
+        
+
+}
