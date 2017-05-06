@@ -52,7 +52,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                 .x(function(d) { return x(d.Date); })
                 .y(function(d) { return y(d.Close); });
         
-            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[0]+".csv?collapse=monthly&start_date="+oneYear.join("-"), function(d){
+            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[0]+".csv?api_key=FtxsvjgZWzvbBRGsHaS9&collapse=monthly&start_date="+oneYear.join("-"), function(d){
                 d.Date = parseTime(d.Date);
                       return d;
                     }, function(error, data) {
@@ -97,7 +97,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
         for (var i = 0; i<$scope.aktienShow.length; i++){
             
         
-          d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[i]+".csv?collapse=monthly&start_date="+oneYear.join("-"), function(d){
+          d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[i]+".csv?api_key=FtxsvjgZWzvbBRGsHaS9&collapse=monthly&start_date="+oneYear.join("-"), function(d){
                 d.Close = +d.Close;
                 d.Date = parseTime(d.Date)  
                 return d;
@@ -156,7 +156,6 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                                 if (check == "good"){
                                     var newAktie = [$cookies.get("aktien")];
                                     newAktie.push(aktie);
-                            
                                     sock.send(newAktie)
                                     
                                 }       

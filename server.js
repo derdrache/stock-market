@@ -16,8 +16,19 @@ app.use(bodyParser.json());
 
 s.on("connection", function(ws){
     ws.on("message", function(message){
-        ws.send(message)
+        
+        s.clients.forEach(function e(client){
+            client.send(message)
+        })
+        
+        
     })
+    
+    ws.on("close", function(){
+        console.log("i lost a Client")
+    })
+        
+    console.log("one more client connected")
 })
 
 
