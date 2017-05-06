@@ -1,41 +1,35 @@
 app.controller('homeController', function($scope, $http, $cookies, $route) {
 
-     
+    var colors = ["steelblue", "red", "green", "gold", "indigo", "lightGreen"];
+    const monthArray=["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
+    var heute = new Date().toString().split(" ");
+   
+    var heuteFormat =[heute[3], monatUmwandlung(heute[1]) ,"1"]
+    var oneYear = [heute[3]-1, monatUmwandlung(heute[1]) ,"1"];
+
+         
     if (!$cookies.get("aktien")){
         $cookies.put("aktien", ["gold"])
     }
 
-
-    $scope.aktienShow = $cookies.get("aktien").split(",");
     
-    /*
-    var aktienDaten =[];
-    for (var i = 0; i<$scope.aktienShow.length; i++){
-        $http.get("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[i]+".csv").success(function(res){
-            aktienDaten.push(res);
-            var csv = res;
-            console.log(res);
-            
-            d3.csv(res, function(d){
-                     d.Close = +d.Close;
-                d.Date = parseTime(d.Date)               
-                return d;
-            }, function (err, data){
-            
 
-        
-            
-            })
-            });    
-        }       
+    console.log($cookies.get("aktien"))
+       
+    /* Websocket */
     
-   */
+    var sock = new WebSocket("wss://dynamic-web-application-projects-derdrache.c9users.io:8081");
    
-
+    sock.onmessage = function(event){
+        $cookies.put("aktien", event.data)
+        $route.reload();
+    }
+    
    
-            
+    
+   $scope.aktienShow = $cookies.get("aktien").split(",");
 
-                        /* Diagram*/
+    /* DiagramZeichnung*/
             
             var svg = d3.select("svg")
             var margin = {top: 20, right: 20, bottom: 80, left: 50};
@@ -45,7 +39,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                 
             
            var parseTime = d3.timeParse("%Y-%m-%d");
-           
+
            
             var x = d3.scaleTime()
                 .range([0,width]);
@@ -58,15 +52,14 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                 .x(function(d) { return x(d.Date); })
                 .y(function(d) { return y(d.Close); });
         
-            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/gold.csv", function(d){
-                d.Close = +d.Close;
-                d.Date = parseTime(d.Date)               
-                return d;
-            }, function (err, data){
-                
-                x.domain([data[data.length-1].Date, d3.max(data, function(d){return d.Date})]); // 1. Pos -> Von wann die skala anfängt
+            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[0]+".csv?collapse=monthly&start_date="+oneYear.join("-"), function(d){
+                d.Date = parseTime(d.Date);
+                      return d;
+                    }, function(error, data) {
+                        
+                x.domain(d3.extent(data, function(d) { return d.Date; })); // 1. Pos -> Von wann die skala anfängt
                  
-                y.domain([0,140]); // festen Wert für linke Spalte
+                y.domain([0,900]); // festen Wert für linke Spalte
                     
                     
                   g.append("g")
@@ -91,34 +84,43 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                       .attr("text-anchor", "end")
                       .text("Price ($)");
                 
-
+            });
 
                       
-            })
             
             
-    
+        /* DiagrammDaten*/
+        
+        
+        
+        var farbIndex = -1;
         for (var i = 0; i<$scope.aktienShow.length; i++){
             
         
-            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[i]+".csv?collapse=monthly", function(d){
+          d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[i]+".csv?collapse=monthly&start_date="+oneYear.join("-"), function(d){
                 d.Close = +d.Close;
-                d.Date = parseTime(d.Date)               
+                d.Date = parseTime(d.Date)  
                 return d;
-            }, function (err, data){
-                
+            }, function (data){
+
                     g.append("path")
                       .datum(data)
                       .attr("fill", "none")
-                      .attr("stroke", "steelblue")
+                      .attr("stroke", function(){ farbIndex++; return colors[farbIndex]; })
                       .attr("stroke-linejoin", "round")
                       .attr("stroke-linecap", "round")
                       .attr("stroke-width", 1.5)
-                      .attr("d", line);
+                      .attr("d", line)
+                      .on("mouseover", function(d){
+                          $scope.anzeige = "test"
+                      })
+                      .on("mouseout", function(d){
+                          $scope.anzeige = "";
+                      })    
                 
                 
-                
-            })            
+            })  
+            
         }
     
     
@@ -132,8 +134,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                 aktien.splice(i,1)
             }
         }
-        $cookies.put("aktien", aktien)
-        $route.reload();
+        sock.send(aktien)
     }
     
     $scope.aktienAdd = function(aktie, event){
@@ -155,18 +156,47 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                                 if (check == "good"){
                                     var newAktie = [$cookies.get("aktien")];
                                     newAktie.push(aktie);
-                                    $cookies.put("aktien", newAktie)
-                                    $route.reload();
+                            
+                                    sock.send(newAktie)
+                                    
                                 }       
                                 else{
                                     $scope.fehlerAusgabe = check;
                                 }            
                             })
-     
+         
        }
     }
+
     
     
+    
+    /* Allgemeine Funktionen*/
+    
+    function monatUmwandlung(monat){ 
+    var index = -1;
+    
+    for(var i=0; i<monthArray.length; i++){
+        
+        if (monat == monthArray[i]){
+            index = i;
+            break;
+        }
+    }
+
+    
+    if (index <10){
+        index = "0"+index;
+    }
+    
+    return index;
+    
+}
 
     
 });
+
+
+
+
+

@@ -3,7 +3,7 @@ body{
 }
 
 input{
-    margin-top: 5%;
+    
     margin-left: 5%;
     width: 55%;
     height: 25%;
@@ -55,7 +55,8 @@ svg{
     width: 48%;
     height: 115px;
     margin-left: 1%;
-    margin-top: 1%;
+    margin-top: 0.5%;
+    margin-bottom: 0.5%;
     padding-left: 1%;
     display:inline-block;
     border-radius: 10px;
@@ -85,14 +86,16 @@ svg{
 }
 
 .addButton{
-    font-size: 20px;
+    
+    font-size: 15px;
     width: 15%;
     height: 25%;
-    margin-top: 5%;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
 
+
+/* Diagramm */
 
 
 
