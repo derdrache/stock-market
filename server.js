@@ -16,10 +16,16 @@ app.use(bodyParser.json());
 
 s.on("connection", function(ws){
     ws.on("message", function(message){
+         console.log(message)
         
-        s.clients.forEach(function e(client){
+        if (message != 1 ){
+          
+           s.clients.forEach(function e(client){
             client.send(message)
-        })
+        }) 
+        }
+        
+        
         
         
     })

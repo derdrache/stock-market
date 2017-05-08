@@ -7,7 +7,7 @@
     <div class="aktienBox">
         
         <div ng-repeat="aktien in aktienShow">
-        <div class="aktien">
+        <div class="aktien" ng-style="{'border-color': bordercolor(aktien)}">
             <button class="deleteButton" ng-click="deleteAktie(aktien)">X</button>
             <h2>{{aktien}}</h2>
             <p>Aktien Infos</p>

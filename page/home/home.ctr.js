@@ -1,20 +1,32 @@
 app.controller('homeController', function($scope, $http, $cookies, $route) {
 
+    // oneYear macht wegen den tagen probleme
+
     var colors = ["steelblue", "red", "green", "gold", "indigo", "lightGreen"];
-    const monthArray=["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
+    const monthArray=["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
     var heute = new Date().toString().split(" ");
    
-    var heuteFormat =[heute[3], monatUmwandlung(heute[1]) ,"1"]
-    var oneYear = [heute[3]-1, monatUmwandlung(heute[1]) ,"1"];
-
+    var heuteFormat =[heute[3], monatUmwandlung(heute[1]) ,heute[2]];
+    var oneYear = [heute[3]-1, monatUmwandlung(heute[1]) ,heute[2]];
+    
          
     if (!$cookies.get("aktien")){
-        $cookies.put("aktien", ["gold"])
+        $cookies.put("aktien", ["gold"]);
     }
+    
+    $scope.aktienShow = $cookies.get("aktien").split(",");
+
+    $scope.bordercolor = function (posCheck){
+        
+        for (var i= 0; i<$scope.aktienShow.length; i++){
+            if (posCheck == $scope.aktienShow[i]){
+                return colors[i]
+            }
+        }
+       
+    };
 
     
-
-    console.log($cookies.get("aktien"))
        
     /* Websocket */
     
@@ -22,12 +34,17 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
    
     sock.onmessage = function(event){
         $cookies.put("aktien", event.data)
+        sock.close();
         $route.reload();
     }
     
+    /* open-ping */
+    
+    setInterval( function(){sock.send(1)}, 27000)
+    
    
     
-   $scope.aktienShow = $cookies.get("aktien").split(",");
+   
 
     /* DiagramZeichnung*/
             
@@ -51,13 +68,9 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
             var line = d3.line()
                 .x(function(d) { return x(d.Date); })
                 .y(function(d) { return y(d.Close); });
-        
-            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[0]+".csv?api_key=FtxsvjgZWzvbBRGsHaS9&collapse=monthly&start_date="+oneYear.join("-"), function(d){
-                d.Date = parseTime(d.Date);
-                      return d;
-                    }, function(error, data) {
-                        
-                x.domain(d3.extent(data, function(d) { return d.Date; })); // 1. Pos -> Von wann die skala anfängt
+
+
+                x.domain([parseTime(oneYear.join("-")),parseTime(heuteFormat.join("-"))]) 
                  
                 y.domain([0,900]); // festen Wert für linke Spalte
                     
@@ -71,9 +84,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                       .attr("y", 17)
                       .text("heute")
                       
-                      
-                      
-                
+
                   g.append("g")
                       .call(d3.axisLeft(y))
                     .append("text")
@@ -84,7 +95,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
                       .attr("text-anchor", "end")
                       .text("Price ($)");
                 
-            });
+           
 
                       
             
@@ -93,35 +104,50 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
         
         
         
-        var farbIndex = -1;
-        for (var i = 0; i<$scope.aktienShow.length; i++){
+        var farbIndex = 0;
+
+        $scope.aktienShow.forEach(function(aktien){
+           
+                
             
-        
-          d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+$scope.aktienShow[i]+".csv?api_key=FtxsvjgZWzvbBRGsHaS9&collapse=monthly&start_date="+oneYear.join("-"), function(d){
+            d3.csv("https://www.quandl.com/api/v3/datasets/wiki/"+aktien+".csv?api_key=FtxsvjgZWzvbBRGsHaS9&start_date="+oneYear.join("-"), function(d){
                 d.Close = +d.Close;
                 d.Date = parseTime(d.Date)  
                 return d;
-            }, function (data){
-
+                }, function (data){
+                        
                     g.append("path")
                       .datum(data)
+                      .attr("d", line)
                       .attr("fill", "none")
-                      .attr("stroke", function(){ farbIndex++; return colors[farbIndex]; })
+                      .attr("stroke", function(){
+                          var index = 0;  
+                        for (var i= 0; i<$scope.aktienShow.length;i++){
+                            if ($scope.aktienShow[i]== aktien){
+                                index= i;
+                            }
+                        }
+                          
+                          return colors[index]; 
+                      })
                       .attr("stroke-linejoin", "round")
                       .attr("stroke-linecap", "round")
                       .attr("stroke-width", 1.5)
-                      .attr("d", line)
+                      
                       .on("mouseover", function(d){
                           $scope.anzeige = "test"
                       })
                       .on("mouseout", function(d){
                           $scope.anzeige = "";
                       })    
+                    
                 
-                
-            })  
+            })
+      
             
-        }
+ 
+            
+        })
     
     
     
@@ -135,6 +161,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
             }
         }
         sock.send(aktien)
+        
     }
     
     $scope.aktienAdd = function(aktie, event){
@@ -178,7 +205,7 @@ app.controller('homeController', function($scope, $http, $cookies, $route) {
     for(var i=0; i<monthArray.length; i++){
         
         if (monat == monthArray[i]){
-            index = i;
+            index = i+1;
             break;
         }
     }
